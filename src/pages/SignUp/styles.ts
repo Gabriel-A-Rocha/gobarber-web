@@ -4,30 +4,30 @@ import { shade } from 'polished';
 
 import signUpBackgroundImg from '../../assets/sign-up-background.png';
 
-export const Container: React.FC = styled.div`
+export const Container = styled.div`
   height: 100vh;
+
   display: flex;
   align-items: stretch;
 `;
 
-export const Content: React.FC = styled.div`
+export const Content = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-  padding: 20px;
+  /* padding: 20px; */
 
   width: 100%;
   max-width: 700px;
   flex: 1;
-
-  place-content: center;
-  align-items: center;
 `;
 
 const appearFromRight = keyframes`
 from{
   opacity: 0;
-  transform: translateX(50px);
+  transform: translateX(-50px);
 }
 to{
   opacity: 1;
