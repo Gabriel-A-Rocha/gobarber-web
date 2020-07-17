@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { shade } from 'polished';
 
@@ -22,6 +22,30 @@ export const Content: React.FC = styled.div`
 
   place-content: center;
   align-items: center;
+`;
+
+const appearFromLeft = keyframes`
+from{
+  opacity: 0;
+  transform: translateX(-50px);
+}
+to{
+  opacity: 1;
+  transform: translateX(0);
+}
+`;
+
+export const AnimationContainer: React.FC = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+  flex: 1;
+  place-content: center;
+  align-items: center;
+
+  animation: ${appearFromLeft} 1s;
 
   form {
     display: flex;

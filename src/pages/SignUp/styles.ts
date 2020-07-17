@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { shade } from 'polished';
 
@@ -22,6 +22,30 @@ export const Content: React.FC = styled.div`
 
   place-content: center;
   align-items: center;
+`;
+
+const appearFromRight = keyframes`
+from{
+  opacity: 0;
+  transform: translateX(50px);
+}
+to{
+  opacity: 1;
+  transform: translateX(0);
+}
+`;
+
+export const AnimationContainer: React.FC = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+  flex: 1;
+  place-content: center;
+  align-items: center;
+
+  animation: ${appearFromRight} 1s;
 
   form {
     display: flex;
@@ -49,7 +73,7 @@ export const Content: React.FC = styled.div`
   }
 
   > a {
-    color: #f4ede8;
+    color: #ff9000;
     display: flex;
     align-items: center;
     margin-top: 24px;
@@ -57,7 +81,7 @@ export const Content: React.FC = styled.div`
     transition: color 0.2s;
 
     &:hover {
-      color: ${shade(0.2, '#f4ede8')};
+      color: ${shade(0.2, '#ff9000')};
     }
 
     svg {
