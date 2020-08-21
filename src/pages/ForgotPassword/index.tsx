@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { FiArrowLeft, FiMail } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -13,12 +13,14 @@ import Input from '../../components/Input/index';
 import Button from '../../components/Button/index';
 
 import { Container, Content, Background, AnimationContainer } from './styles';
+import api from '../../services/api';
 
 interface ForgotPasswordFormData {
   email: string;
 }
 
 const ForgotPassword: React.FC = () => {
+  const [loading, setLoading] = useState(false);
   const formRef = useRef<FormHandles>(null);
 
   const { addToast } = useToast();
@@ -26,6 +28,8 @@ const ForgotPassword: React.FC = () => {
   const handleSubmit = useCallback(
     async (data: ForgotPasswordFormData) => {
       try {
+        setLoading(true);
+
         // reset errors
         formRef.current?.setErrors({});
 
@@ -39,7 +43,17 @@ const ForgotPassword: React.FC = () => {
           abortEarly: false,
         });
 
+        addToast({
+          type: 'success',
+          title: 'Recovery email sent!',
+          description:
+            'Please check your mailbox and click on the link to recover your password.',
+        });
+
         // password recovery
+        await api.post('/password/forgot', {
+          email: data.email,
+        });
       } catch (err) {
         // check if it is a validation error (wrong format)
         if (err instanceof Yup.ValidationError) {
@@ -56,6 +70,8 @@ const ForgotPassword: React.FC = () => {
           description:
             'An error occurred during password recovery. Please try again.',
         });
+      } finally {
+        setLoading(false);
       }
     },
     [addToast],
@@ -72,7 +88,9 @@ const ForgotPassword: React.FC = () => {
 
             <Input name="email" icon={FiMail} placeholder="E-mail" />
 
-            <Button type="submit">Recover</Button>
+            <Button loading={loading} type="submit">
+              Recover
+            </Button>
           </Form>
 
           <Link to="/">
