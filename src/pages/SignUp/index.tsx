@@ -34,11 +34,11 @@ const SignUp: React.FC = () => {
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
-          name: Yup.string().required('Nome obrigatório'),
+          name: Yup.string().required('Name required'),
           email: Yup.string()
-            .required('Email obrigatório')
-            .email('Digite um email válido'),
-          password: Yup.string().required('Senha obrigatória'),
+            .required('Email required')
+            .email('Invalid email address'),
+          password: Yup.string().required('Password required'),
         });
 
         await schema.validate(data, {
@@ -49,8 +49,8 @@ const SignUp: React.FC = () => {
 
         addToast({
           type: 'success',
-          title: 'Cadastro realizado!',
-          description: 'Você já pode fazer seu logon no GoBarber!',
+          title: 'Registration successful!',
+          description: 'You can now access GoBarber!',
         });
 
         history.push('/');
@@ -63,9 +63,9 @@ const SignUp: React.FC = () => {
         } else {
           // in case of wrong information, display a toast message
           addToast({
-            title: 'Erro no cadastro',
+            title: 'Registration error',
             type: 'error',
-            description: 'Ocorreu um erro no cadastro. Tente novamente.',
+            description: 'Registration failed. Please try again.',
           });
         }
       }
@@ -83,23 +83,23 @@ const SignUp: React.FC = () => {
             <img src={logoImg} alt="GoBarber" />
 
             <Form ref={formRef} onSubmit={handleSubmit}>
-              <h1>Faça seu cadastro</h1>
+              <h1>Register</h1>
 
-              <Input name="name" icon={FiUser} placeholder="Nome" />
-              <Input name="email" icon={FiMail} placeholder="E-mail" />
+              <Input name="name" icon={FiUser} placeholder="Name" />
+              <Input name="email" icon={FiMail} placeholder="Email" />
               <Input
                 name="password"
                 icon={FiLock}
                 type="password"
-                placeholder="Senha"
+                placeholder="Password"
               />
 
-              <Button type="submit">Cadastrar</Button>
+              <Button type="submit">Register</Button>
             </Form>
 
             <Link to="/">
               <FiArrowLeft />
-              Voltar para logon
+              Return to login
             </Link>
           </AnimationContainer>
         </Content>
