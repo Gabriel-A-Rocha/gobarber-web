@@ -152,6 +152,65 @@ export const NextAppointment = styled.div`
   }
 `;
 
+export const Section = styled.section`
+  margin-top: 48px;
+
+  > strong {
+    color: #999591;
+    font-size: 20px;
+    line-height: 26px;
+    border-bottom: 1px solid #3e3b47;
+    display: block;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+  }
+`;
+
+export const Appointment = styled.div`
+  display: flex;
+  align-items: center;
+  /* margin: 24px 0; */
+
+  /* do not select first card */
+  & + div {
+    margin-top: 16px;
+  }
+
+  span {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    color: #f4ede8;
+
+    svg {
+      color: #ff9000;
+      margin-right: 8px;
+    }
+  }
+
+  div {
+    background: #3e3b47;
+    display: flex;
+    align-items: center;
+    margin-left: 24px;
+    padding: 16px 24px;
+    border-radius: 10px;
+    margin-left: 24px;
+    flex: 1;
+
+    img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+    }
+
+    strong {
+      margin-left: 32px;
+      font-size: 16px;
+    }
+  }
+`;
+
 export const Calendar = styled.aside`
   width: 380px;
 `;
