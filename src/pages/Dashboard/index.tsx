@@ -5,6 +5,7 @@ import DayPicker, { DayModifiers } from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 
 import { FiPower, FiClock } from 'react-icons/fi';
+import { parseISO } from 'date-fns/esm';
 import {
   Container,
   Header,
@@ -30,6 +31,7 @@ interface MonthAvailabilityItem {
 interface Appointment {
   id: string;
   date: string;
+  hourFormatted: string;
   user: {
     name: string;
     avatar_url: string;
@@ -75,7 +77,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     // fetch provider appointments for the selected day
     api
-      .get('appointments/me', {
+      .get<Appointment[]>('appointments/me', {
         params: {
           year: selectedDate.getFullYear(),
           month: selectedDate.getMonth() + 1,
@@ -83,7 +85,14 @@ const Dashboard: React.FC = () => {
         },
       })
       .then(response => {
-        setAppointments(response.data);
+        const appointmentsFormatted = response.data.map(appointment => {
+          return {
+            ...appointment,
+            hourFormatted: format(parseISO(appointment.date), 'HH:mm'),
+          };
+        });
+
+        setAppointments(appointmentsFormatted);
       });
   }, [selectedDate]);
 
@@ -112,6 +121,18 @@ const Dashboard: React.FC = () => {
       locale: enUS,
     });
   }, [selectedDate]);
+
+  const morningAppointments = useMemo(() => {
+    return appointments.filter(appointment => {
+      return parseISO(appointment.date).getHours() < 12;
+    });
+  }, [appointments]);
+
+  const afternoonAppointments = useMemo(() => {
+    return appointments.filter(appointment => {
+      return parseISO(appointment.date).getHours() >= 12;
+    });
+  }, [appointments]);
 
   return (
     <Container>
@@ -144,7 +165,7 @@ const Dashboard: React.FC = () => {
           </p>
 
           <NextAppointment>
-            <strong>Next appointments</strong>
+            <strong>Next appointment</strong>
             <div>
               <img
                 src="https://avatars2.githubusercontent.com/u/60102062?s=460&u=d46cf65e8d14695ff7ef324c1bc2d903d8248f24&v=4"
@@ -162,73 +183,49 @@ const Dashboard: React.FC = () => {
           <Section>
             <strong>Morning</strong>
 
-            <Appointment>
-              <span>
-                <FiClock />
-                08:00
-              </span>
+            {morningAppointments.map(appointment => {
+              return (
+                <Appointment key={appointment.id}>
+                  <span>
+                    <FiClock />
+                    {appointment.hourFormatted}
+                  </span>
 
-              <div>
-                <img
-                  src="https://avatars2.githubusercontent.com/u/60102062?s=460&u=d46cf65e8d14695ff7ef324c1bc2d903d8248f24&v=4"
-                  alt="Gabriel A Rocha"
-                />
+                  <div>
+                    <img
+                      src={appointment.user.avatar_url}
+                      alt={appointment.user.name}
+                    />
 
-                <strong>Gabriel A. Rocha</strong>
-              </div>
-            </Appointment>
-
-            <Appointment>
-              <span>
-                <FiClock />
-                09:00
-              </span>
-
-              <div>
-                <img
-                  src="https://avatars2.githubusercontent.com/u/60102062?s=460&u=d46cf65e8d14695ff7ef324c1bc2d903d8248f24&v=4"
-                  alt="Gabriel A Rocha"
-                />
-
-                <strong>Gabriel A. Rocha</strong>
-              </div>
-            </Appointment>
+                    <strong>{appointment.user.name}</strong>
+                  </div>
+                </Appointment>
+              );
+            })}
           </Section>
 
           <Section>
             <strong>Afternoon</strong>
 
-            <Appointment>
-              <span>
-                <FiClock />
-                13:00
-              </span>
+            {afternoonAppointments.map(appointment => {
+              return (
+                <Appointment key={appointment.id}>
+                  <span>
+                    <FiClock />
+                    {appointment.hourFormatted}
+                  </span>
 
-              <div>
-                <img
-                  src="https://avatars2.githubusercontent.com/u/60102062?s=460&u=d46cf65e8d14695ff7ef324c1bc2d903d8248f24&v=4"
-                  alt="Gabriel A Rocha"
-                />
+                  <div>
+                    <img
+                      src={appointment.user.avatar_url}
+                      alt={appointment.user.name}
+                    />
 
-                <strong>Gabriel A. Rocha</strong>
-              </div>
-            </Appointment>
-
-            <Appointment>
-              <span>
-                <FiClock />
-                14:00
-              </span>
-
-              <div>
-                <img
-                  src="https://avatars2.githubusercontent.com/u/60102062?s=460&u=d46cf65e8d14695ff7ef324c1bc2d903d8248f24&v=4"
-                  alt="Gabriel A Rocha"
-                />
-
-                <strong>Gabriel A. Rocha</strong>
-              </div>
-            </Appointment>
+                    <strong>{appointment.user.name}</strong>
+                  </div>
+                </Appointment>
+              );
+            })}
           </Section>
         </Schedule>
 
