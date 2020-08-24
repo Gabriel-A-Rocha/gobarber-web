@@ -2,10 +2,28 @@ import styled from 'styled-components';
 import { shade } from 'polished';
 
 export const Container = styled.div`
-  height: 100vh;
+  > header {
+    height: 160px;
+    background: #28262e;
 
-  display: flex;
-  align-items: stretch;
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    div {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+
+      svg {
+        color: #999591;
+        width: 40px;
+        height: 40px;
+        padding: 5px;
+      }
+    }
+  }
 `;
 
 export const Content = styled.div`
@@ -13,7 +31,7 @@ export const Content = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
+  margin: -170px auto 0;
 
   width: 100%;
 
