@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, FormEvent, ChangeEvent } from 'react';
 import { FiMail, FiLock, FiUser, FiCamera, FiArrowLeft } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -18,7 +18,9 @@ import { Container, Content, AvatarInput } from './styles';
 interface ProfileFormData {
   name: string;
   email: string;
+  old_password: string;
   password: string;
+  password_confirmation: string;
 }
 
 const Profile: React.FC = () => {
@@ -26,7 +28,7 @@ const Profile: React.FC = () => {
   const { addToast } = useToast();
   const history = useHistory();
 
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const handleSubmit = useCallback(
     async (data: ProfileFormData) => {
@@ -34,27 +36,69 @@ const Profile: React.FC = () => {
         // reset errors
         formRef.current?.setErrors({});
 
+        // input fields validation
         const schema = Yup.object().shape({
           name: Yup.string().required('Name required'),
+
           email: Yup.string()
             .required('Email required')
             .email('Invalid email address'),
-          password: Yup.string().required('Password required'),
+
+          old_password: Yup.string(),
+
+          password: Yup.string().when('old_password', {
+            is: val => !!val.length,
+            then: Yup.string().required('Type the new password.'),
+            otherwise: Yup.string(),
+          }),
+
+          password_confirmation: Yup.string()
+            .when('old_password', {
+              is: val => !!val.length,
+              then: Yup.string().required('Confirm the new password.'),
+              otherwise: Yup.string(),
+            })
+            .oneOf(
+              [Yup.ref('password')],
+              'New password and confirmation do not match.',
+            ),
         });
 
         await schema.validate(data, {
           abortEarly: false,
         });
 
-        await api.post('/users', data);
+        const {
+          name,
+          email,
+          old_password,
+          password,
+          password_confirmation,
+        } = data;
+
+        const formData = {
+          name,
+          email,
+          ...(old_password
+            ? {
+                old_password,
+                password,
+                password_confirmation,
+              }
+            : {}),
+        };
+
+        const response = await api.put('/profile', formData);
+
+        updateUser(response.data);
+
+        history.push('/dashboard');
 
         addToast({
           type: 'success',
-          title: 'Registration successful!',
-          description: 'You can now access GoBarber!',
+          title: 'Profile updated!',
+          description: 'Your profile has been updated successfully.',
         });
-
-        history.push('/');
       } catch (err) {
         // check if it's a format error
         if (err instanceof Yup.ValidationError) {
@@ -64,14 +108,35 @@ const Profile: React.FC = () => {
         } else {
           // in case of wrong information, display a toast message
           addToast({
-            title: 'Registration error',
+            title: 'Update error',
             type: 'error',
-            description: 'Registration failed. Please try again.',
+            description: 'Your profile has not been updated. Please try again.',
           });
         }
       }
     },
-    [addToast, history],
+    [addToast, history, updateUser],
+  );
+
+  const handleAvatarChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        // console.log(e.target.files[0]);
+        const data = new FormData();
+
+        data.append('avatar', e.target.files[0]);
+
+        api.patch('users/avatar', data).then(response => {
+          updateUser(response.data);
+
+          addToast({
+            type: 'success',
+            title: 'Avatar picture updated!',
+          });
+        });
+      }
+    },
+    [addToast, updateUser],
   );
 
   return (
@@ -96,9 +161,11 @@ const Profile: React.FC = () => {
           >
             <AvatarInput>
               <img src={user.avatar_url} alt={user.name} />
-              <button type="button">
+              <label htmlFor="avatar">
                 <FiCamera />
-              </button>
+
+                <input type="file" id="avatar" onChange={handleAvatarChange} />
+              </label>
             </AvatarInput>
 
             <h1>My profile</h1>
